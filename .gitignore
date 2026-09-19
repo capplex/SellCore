@@ -1,0 +1,13 @@
+node_modules
+.next
+.env
+.env.local
+coverage
+*.log
+.DS_Store
+
+# Cloudflare / OpenNext
+.open-next/
+.wrangler/
+.dev.vars
+cloudflare-env.d.ts

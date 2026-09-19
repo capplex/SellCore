@@ -1,0 +1,2 @@
+import { authenticateApiRequest,apiError } from "@/lib/api/auth";
+export async function GET(req:Request){try{const {db,merchantId}=await authenticateApiRequest(req,"store:read");const {data,error}=await db.from("stores").select("id,name,slug,description,status,default_currency,created_at,updated_at").eq("merchant_id",merchantId).order("created_at");if(error)throw error;return Response.json({data});}catch(e){return apiError(e)}}

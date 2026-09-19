@@ -1,0 +1,12 @@
+"use server";
+import { redirect } from "next/navigation";
+import { requireUser } from "@/lib/auth/session";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { slugify } from "@/lib/utils";
+import { canCreateStore } from "@/lib/usage/service";
+import { z } from "zod";
+
+const schema=z.object({storeName:z.string().min(2).max(80),storeSlug:z.string().min(2).max(64),description:z.string().max(300).optional()});
+export async function createFirstStoreAction(formData:FormData){const user=await requireUser("/onboarding"); const input=schema.parse({storeName:formData.get("storeName"),storeSlug:formData.get("storeSlug"),description:formData.get("description")||""}); const db=createSupabaseAdminClient(); let {data:member}=await db.from("merchant_members").select("merchant_id").eq("user_id",user.id).limit(1).maybeSingle(); let merchantId=member?.merchant_id as string|undefined; if(!merchantId){const merchantSlug=`${slugify(input.storeSlug)}-${user.id.slice(0,6)}`; const {data:merchant,error}=await db.from("merchants").insert({name:input.storeName,slug:merchantSlug}).select("*").single(); if(error||!merchant) throw new Error(error?.message??"MERCHANT_CREATE_FAILED"); merchantId=merchant.id; await db.from("merchant_members").insert({merchant_id:merchantId,user_id:user.id,role:"owner"}); const {data:free}=await db.from("platform_plans").select("id").eq("is_free",true).eq("is_active",true).single(); if(!free) throw new Error("No Free plan configured"); await db.from("merchant_subscriptions").insert({merchant_id:merchantId,plan_id:free.id,status:"free",billing_interval:"none"}); }
+if (!merchantId) throw new Error("MERCHANT_CREATE_FAILED");
+const cap=await canCreateStore(merchantId); if(!cap.allowed) throw new Error("PLAN_LIMIT:stores"); const slug=slugify(input.storeSlug); const {data:store,error}=await db.from("stores").insert({merchant_id:merchantId,name:input.storeName,slug,description:input.description,status:"draft"}).select("*").single(); if(error||!store) throw new Error(error?.message??"STORE_CREATE_FAILED"); await db.from("store_settings").insert({store_id:store.id,title:input.storeName,meta_description:input.description}); const {data:theme}=await db.from("themes").select("id,defaults").eq("slug","dark").single(); if(theme) await db.from("theme_settings").insert({store_id:store.id,theme_id:theme.id,settings:theme.defaults}); redirect("/dashboard"); }

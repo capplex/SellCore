@@ -1,0 +1,5 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+const schema=z.object({storeSlug:z.string(),eventType:z.enum(["store_view","product_view","add_to_cart","checkout_start"]),productId:z.string().uuid().optional(),source:z.string().max(200).optional()});
+export async function POST(req:Request){try{const body=schema.parse(await req.json());const db=createSupabaseAdminClient();const {data:store}=await db.from("stores").select("id").eq("slug",body.storeSlug).eq("status","published").maybeSingle();if(!store)return NextResponse.json({ok:false},{status:404});if(body.productId){const {data:p}=await db.from("products").select("id").eq("id",body.productId).eq("store_id",store.id).eq("status","active").maybeSingle();if(!p)return NextResponse.json({ok:false},{status:400});}await db.from("analytics_events").insert({store_id:store.id,event_type:body.eventType,product_id:body.productId??null,source:body.source??null});return NextResponse.json({ok:true});}catch{return NextResponse.json({ok:false},{status:400});}}

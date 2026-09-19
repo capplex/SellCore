@@ -1,0 +1,2 @@
+"use client";
+export default function ErrorState({reset}:{error:Error;reset:()=>void}){return <div className="rounded-xl border border-red-950 bg-red-950/20 p-6"><h2 className="font-semibold">SellCore couldn’t load this section.</h2><p className="mt-2 text-sm text-sc-secondary">Try again. Sensitive server details are not shown here.</p><button onClick={reset} className="mt-4 rounded-lg bg-sc-red px-4 py-2 text-sm">Try again</button></div>}

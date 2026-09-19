@@ -1,0 +1,6 @@
+import Link from "next/link";
+import { requireAdmin } from "@/lib/auth/session";
+import { Logo } from "@/components/logo";
+export const dynamic="force-dynamic";
+const links=[["Overview","/admin"],["Merchants","/admin/merchants"],["Users","/admin/users"],["Stores","/admin/stores"],["Orders","/admin/orders"],["Products","/admin/products"],["Payments","/admin/payments"],["Subscriptions","/admin/subscriptions"],["Plans","/admin/plans"],["Reviews","/admin/reviews"],["Domains","/admin/domains"],["Reports","/admin/reports"],["System","/admin/settings"]];
+export default async function AdminLayout({children}:{children:React.ReactNode}){await requireAdmin();return <div className="min-h-screen"><header className="border-b border-sc-border bg-[#080808]"><div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4"><Logo/><span className="rounded-full border border-sc-red px-2 py-1 text-[10px] font-semibold text-[#ff7a80]">PLATFORM ADMIN</span></div></header><div className="mx-auto grid max-w-7xl gap-6 px-5 py-6 lg:grid-cols-[190px_1fr]"><nav className="space-y-1">{links.map(([l,h])=><Link key={h} href={h} className="block rounded-lg px-3 py-2 text-sm text-sc-secondary hover:bg-[#111] hover:text-white">{l}</Link>)}</nav><main className="min-w-0">{children}</main></div></div>}
