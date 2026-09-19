@@ -1,3 +1,3 @@
 import { AuthForm } from "@/components/auth/auth-form";
 import { loginAction } from "@/lib/auth/actions";
-export default async function Login({searchParams}:{searchParams:Promise<{next?:string}>}){const q=await searchParams; return <><h1 className="text-2xl font-semibold">Log in</h1><p className="mb-6 mt-2 text-sm text-sc-secondary">Access your SellCore workspace.</p><AuthForm mode="login" next={q.next} action={async (_s,f)=>loginAction(f)}/></>}
+export default async function Login({searchParams}:{searchParams:Promise<{next?:string}>}){const q=await searchParams; return <><h1 className="text-2xl font-semibold">Log in</h1><p className="mb-6 mt-2 text-sm text-sc-secondary">Access your SellCore workspace.</p><AuthForm mode="login" next={q.next} action={loginAction}/></>}
