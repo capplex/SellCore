@@ -1,0 +1,49 @@
+name: Import SellCore project
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "SellCore-Cloudflare.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Extract SellCore
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .sellcore-import
+          mkdir .sellcore-import
+          unzip -q SellCore-Cloudflare.zip -d .sellcore-import
+
+          if [ -d ".sellcore-import/sellcore" ]; then
+            cp -a .sellcore-import/sellcore/. ./
+          else
+            cp -a .sellcore-import/. ./
+          fi
+
+          rm -rf .sellcore-import
+          rm -f SellCore-Cloudflare.zip
+          rm -f .gitkeep
+
+      - name: Commit extracted project
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "SellCore Import Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Import SellCore Cloudflare project"
+          git push
