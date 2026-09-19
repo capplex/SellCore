@@ -1,0 +1,32 @@
+name: Build verify
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_APP_URL: https://sellcore.shop
+      NEXT_PUBLIC_PLATFORM_DOMAIN: sellcore.shop
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: test-service-role-key
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
+      STRIPE_SECRET_KEY: sk_test_placeholder
+      ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef
+      EMAIL_PROVIDER: console
+      EMAIL_FROM: SellCore <no-reply@sellcore.shop>
+      CRON_SECRET: test-cron-secret
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm install
+      - run: npm run cf:build
+      - name: Verify Worker entrypoint
+        run: test -f .open-next/worker.js
