@@ -6,7 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 export async function getDashboardContext() {
   const auth = await requireMerchant();
   const db = await createSupabaseServerClient();
-  const { data: stores } = await db.from("stores").select("id,name,slug,status,merchant_id").eq("merchant_id", auth.merchantId).order("created_at");
+  const { data: stores } = await db.from("stores").select("id,name,slug,status,merchant_id,description,default_currency").eq("merchant_id", auth.merchantId).order("created_at");
   if (!stores?.length) return { ...auth, stores: [], store: null, db };
   const cookieStore = await cookies();
   const wanted = cookieStore.get("sc_store")?.value;
