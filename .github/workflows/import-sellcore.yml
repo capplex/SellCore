@@ -20,12 +20,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .sellcore-import/part-* > .sellcore-import/archive.b64
+          cat .sellcore-import/small-* > .sellcore-import/archive.b64
           base64 -d .sellcore-import/archive.b64 > .sellcore-import/SellCore-Cloudflare.tar.xz
           mkdir .sellcore-import/extracted
           tar -xJf .sellcore-import/SellCore-Cloudflare.tar.xz -C .sellcore-import/extracted
           cp -a .sellcore-import/extracted/. ./
-          cp public/assets/sellcore-logo.png app/icon.png
           rm -rf .sellcore-import
           rm -f .gitkeep
           rm -f .github/workflows/import-sellcore.yml
