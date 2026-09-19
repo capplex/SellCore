@@ -6,7 +6,10 @@ export async function createAuthorizedDownload(fileId: string, userId: string) {
   const db = createSupabaseAdminClient();
   const { data: file } = await db.from("digital_files").select("id,storage_path,max_downloads,product_id,products!inner(store_id,stores!inner(merchant_id))").eq("id", fileId).single();
   if (!file) throw new Error("FILE_NOT_FOUND");
-  const merchantId = file.products.stores.merchant_id as string;
+  const product = Array.isArray(file.products) ? file.products[0] : file.products;
+  const store = product && Array.isArray(product.stores) ? product.stores[0] : product?.stores;
+  const merchantId = store?.merchant_id as string | undefined;
+  if (!merchantId) throw new Error("MERCHANT_NOT_FOUND");
   const [usage, limits] = await Promise.all([getMerchantUsage(merchantId), getPlanLimits(merchantId)]);
   if (limits.digital_downloads_monthly !== Infinity && usage.digital_downloads_monthly >= limits.digital_downloads_monthly) throw new Error("PLAN_LIMIT:digital_downloads_monthly");
   const { data: customer } = await db.from("customers").select("id").eq("auth_user_id", userId);
