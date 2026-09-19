@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "SellCore-Cloudflare.zip"
+      - ".sellcore-import/**"
 
 permissions:
   contents: write
@@ -16,23 +16,19 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Extract SellCore
+      - name: Rebuild and extract SellCore
         shell: bash
         run: |
           set -euo pipefail
+          cat .sellcore-import/part-* > .sellcore-import/archive.b64
+          base64 -d .sellcore-import/archive.b64 > .sellcore-import/SellCore-Cloudflare.tar.xz
+          mkdir .sellcore-import/extracted
+          tar -xJf .sellcore-import/SellCore-Cloudflare.tar.xz -C .sellcore-import/extracted
+          cp -a .sellcore-import/extracted/. ./
+          cp public/assets/sellcore-logo.png app/icon.png
           rm -rf .sellcore-import
-          mkdir .sellcore-import
-          unzip -q SellCore-Cloudflare.zip -d .sellcore-import
-
-          if [ -d ".sellcore-import/sellcore" ]; then
-            cp -a .sellcore-import/sellcore/. ./
-          else
-            cp -a .sellcore-import/. ./
-          fi
-
-          rm -rf .sellcore-import
-          rm -f SellCore-Cloudflare.zip
           rm -f .gitkeep
+          rm -f .github/workflows/import-sellcore.yml
 
       - name: Commit extracted project
         shell: bash
