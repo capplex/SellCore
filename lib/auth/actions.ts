@@ -6,7 +6,9 @@ import { z } from "zod";
 
 const authSchema = z.object({ email: z.string().email(), password: z.string().min(8).max(128) });
 
-export async function loginAction(formData: FormData) {
+type AuthState = { error?: string; success?: string } | undefined;
+
+export async function loginAction(_state: AuthState, formData: FormData) {
   const parsed = authSchema.safeParse({ email: formData.get("email"), password: formData.get("password") });
   if (!parsed.success) return { error: "Enter a valid email and password (8+ characters)." };
   const supabase = await createSupabaseServerClient();
@@ -16,7 +18,7 @@ export async function loginAction(formData: FormData) {
   redirect(next.startsWith("/") ? next : "/dashboard");
 }
 
-export async function registerAction(formData: FormData) {
+export async function registerAction(_state: AuthState, formData: FormData) {
   const parsed = authSchema.safeParse({ email: formData.get("email"), password: formData.get("password") });
   if (!parsed.success) return { error: "Enter a valid email and password (8+ characters)." };
   const supabase = await createSupabaseServerClient();
@@ -29,7 +31,7 @@ export async function registerAction(formData: FormData) {
   return { success: "Check your email to verify your account." };
 }
 
-export async function forgotPasswordAction(formData: FormData) {
+export async function forgotPasswordAction(_state: AuthState, formData: FormData) {
   const email = z.string().email().safeParse(formData.get("email"));
   if (!email.success) return { error: "Enter a valid email." };
   const supabase = await createSupabaseServerClient();
@@ -39,7 +41,7 @@ export async function forgotPasswordAction(formData: FormData) {
   return error ? { error: error.message } : { success: "Password reset email sent." };
 }
 
-export async function resetPasswordAction(formData: FormData) {
+export async function resetPasswordAction(_state: AuthState, formData: FormData) {
   const password = z.string().min(8).max(128).safeParse(formData.get("password"));
   if (!password.success) return { error: "Password must be at least 8 characters." };
   const supabase = await createSupabaseServerClient();
