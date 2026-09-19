@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - ".sellcore-import/READY"
+      - "SellCore-Cloudflare.zip"
 
 permissions:
   contents: write
