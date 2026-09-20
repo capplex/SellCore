@@ -4,6 +4,25 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-09-19",
   "compatibility_flags": ["nodejs_compat"],
+  "keep_vars": true,
+  "routes": [
+    {
+      "pattern": "sellcore.shop",
+      "custom_domain": true
+    },
+    {
+      "pattern": "*.sellcore.shop/*",
+      "zone_name": "sellcore.shop"
+    }
+  ],
+  "vars": {
+    "EMAIL_FROM": "SellCore <no-reply@sellcore.shop>",
+    "EMAIL_PROVIDER": "console",
+    "NEXT_PUBLIC_APP_URL": "https://sellcore.shop",
+    "NEXT_PUBLIC_PLATFORM_DOMAIN": "sellcore.shop",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_7WJgAmRMfRD62t4ekOzSzw_odZh1VXA",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://owhljndsrjxnfrtyfdii.supabase.co"
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
