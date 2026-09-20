@@ -6,7 +6,7 @@ async function deliverGenerated(item: Record<string, unknown>, config: Record<st
   const endpoint = typeof config.endpoint_url === "string" ? config.endpoint_url : null;
   const encryptedSecret = typeof config.encrypted_secret === "string" ? config.encrypted_secret : null;
   if (!endpoint || !encryptedSecret) throw new Error("GENERATED_PRODUCT_NOT_CONFIGURED");
-  const body = JSON.stringify({ order_item_id: item.id, product_id: item.product_id, quantity: item.quantity });
+  const body = JSON.stringify({ order_item_id: item.id, product_id: item.product_id, variant_id: item.variant_id ?? null, quantity: item.quantity });
   const secret = decryptSecret(encryptedSecret);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);

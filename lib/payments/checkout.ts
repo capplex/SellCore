@@ -5,6 +5,7 @@ import { validateCoupon } from "@/lib/payments/coupons";
 import { randomToken, sha256 } from "@/lib/crypto";
 import { serverEnv } from "@/lib/env";
 import { getMerchantUsage, getPlanLimits } from "@/lib/usage/service";
+import { selectRequiredVariant } from "@/lib/variant-selection";
 
 export type CheckoutCartItem = { productId: string; variantId?: string | null; quantity: number };
 
@@ -17,14 +18,17 @@ export async function createStoreCheckout(params: { storeSlug: string; email: st
   const ids = [...new Set(params.items.map((i) => i.productId))];
   const { data: products } = await db.from("products").select("*").eq("store_id", store.id).in("id", ids).eq("status", "active");
   if (!products || products.length !== ids.length) throw new Error("PRODUCT_UNAVAILABLE");
-  const variants = params.items.some((i) => i.variantId)
-    ? (await db.from("product_variants").select("*").in("id", params.items.map((i) => i.variantId).filter(Boolean) as string[])).data ?? []
-    : [];
+  const { data: variants, error: variantsError } = await db
+    .from("product_variants")
+    .select("*")
+    .in("product_id", ids)
+    .eq("active", true);
+  if (variantsError) throw variantsError;
+  const activeVariants = variants ?? [];
 
   const computed = params.items.map((item) => {
     const product = products.find((p) => p.id === item.productId)!;
-    const variant = item.variantId ? variants.find((v) => v.id === item.variantId && v.product_id === product.id) : null;
-    if (item.variantId && !variant) throw new Error("VARIANT_UNAVAILABLE");
+    const variant = selectRequiredVariant(activeVariants, product.id, item.variantId);
     const quantity = Math.max(1, Math.min(100, Math.trunc(item.quantity)));
     const price = variant?.price_minor ?? product.price_minor;
     const available = variant?.inventory_quantity ?? product.inventory_quantity;

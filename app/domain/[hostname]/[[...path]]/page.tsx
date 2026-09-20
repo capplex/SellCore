@@ -91,7 +91,7 @@ export default async function CustomDomain({
               basePath={basePath}
               storeSlug={store.slug}
               productId={product.id}
-              variants={(product.product_variants ?? []).filter((variant: { active: boolean }) => variant.active).map((variant: { id: string; name: string }) => ({ id: variant.id, name: variant.name }))}
+              variants={(product.product_variants ?? []).filter((variant: { active: boolean }) => variant.active).map((variant: { id: string; name: string; price_minor: number | null }) => ({ id: variant.id, name: variant.name, priceMinor: variant.price_minor, currency: product.currency }))}
             />
           </div>
         </div>
