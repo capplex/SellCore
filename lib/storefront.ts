@@ -126,7 +126,7 @@ export function themeVars(store:Record<string,unknown>, preview=false){
   };
   const selectedFont=settings.font||"Manrope";
   return {
-    background:settings.background||"#050505",
+    backgroundColor:settings.background||"#050505",
     color:settings.text||"#F5F5F5",
     fontFamily:fontFamilies[selectedFont]||fontFamilies.Manrope,
     "--accent":settings.accent||"#E50914",
