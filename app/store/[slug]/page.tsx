@@ -16,7 +16,7 @@ export default async function StoreHome({params,searchParams}:{params:Promise<{s
   const basePath=await storefrontBasePath(slug);
   const sections=storefrontSections(store,preview);
 
-  return <StoreShell store={store} basePath={basePath}>
+  return <StoreShell store={store} basePath={basePath} preview={preview}>
     <TrackView storeSlug={slug}/>
     {sections
       ? <SectionRenderer sections={sections} store={store} products={products} reviews={reviews} basePath={basePath}/>
