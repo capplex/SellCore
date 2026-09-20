@@ -56,7 +56,9 @@ export default async function Themes(){
               </div>
               <div className="mt-5 flex flex-wrap gap-2">
                 <Link href={"/dashboard/themes/"+t.id} className="rounded-lg border border-sc-border px-3 py-2 text-sm">Edit</Link>
-                <form action={activateMerchantThemeAction}><input type="hidden" name="themeId" value={t.id}/><button className="rounded-lg border border-sc-border px-3 py-2 text-sm">{activeCustomId===t.id?"Active":"Use theme"}</button></form>
+                {t.status==="published"
+                  ? <form action={activateMerchantThemeAction}><input type="hidden" name="themeId" value={t.id}/><button className="rounded-lg border border-sc-border px-3 py-2 text-sm">{activeCustomId===t.id?"Active":"Use theme"}</button></form>
+                  : <span className="rounded-lg border border-amber-900/50 bg-amber-950/20 px-3 py-2 text-sm text-amber-200/80">Draft · publish first</span>}
                 <form action={duplicateMerchantThemeAction}><input type="hidden" name="themeId" value={t.id}/><button className="rounded-lg border border-sc-border px-3 py-2 text-sm">Duplicate</button></form>
               </div>
             </div>)
