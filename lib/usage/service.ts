@@ -18,7 +18,11 @@ export async function getMerchantPlan(merchantId: string) {
     .select("*, platform_plans(*)")
     .eq("merchant_id", merchantId)
     .maybeSingle();
-  if (subscription) return subscription;
+  if (subscription) {
+    const relation = (subscription as { platform_plans?: unknown }).platform_plans;
+    const normalizedPlan = Array.isArray(relation) ? relation[0] : relation;
+    if (normalizedPlan) return { ...subscription, platform_plans: normalizedPlan };
+  }
   const { data: free } = await db.from("platform_plans").select("*").eq("is_free", true).eq("is_active", true).single();
   if (!free) throw new Error("No active Free plan is configured.");
   return { merchant_id: merchantId, plan_id: free.id, status: "free", billing_interval: "none", platform_plans: free };
