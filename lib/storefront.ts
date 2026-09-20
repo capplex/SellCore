@@ -60,10 +60,13 @@ export function publicImageUrl(path:string){
   return db.storage.from("product-images").getPublicUrl(path).data.publicUrl;
 }
 
-export function themeVars(store:Record<string,unknown>){
+export function themeVars(store:Record<string,unknown>, preview=false){
   const ts=themeSettingsRecord(store);
   const custom=activeCustomTheme(store);
-  const settings=((custom?.settings as Record<string,string>|undefined) ?? (ts.settings as Record<string,string>|undefined) ?? {});
+  const canUseCustom=Boolean(custom)&&(preview||custom?.status==="published");
+  const settings=(canUseCustom
+    ? ((preview?custom?.settings:custom?.published_settings) as Record<string,string>|undefined)
+    : (ts.settings as Record<string,string>|undefined)) ?? {};
   return {
     background:settings.background||"#050505",
     color:settings.text||"#F5F5F5",
@@ -74,14 +77,16 @@ export function themeVars(store:Record<string,unknown>){
   } as React.CSSProperties;
 }
 
-export function customThemeCss(store:Record<string,unknown>){
+export function customThemeCss(store:Record<string,unknown>, preview=false){
   const custom=activeCustomTheme(store);
-  return typeof custom?.custom_css==="string"?custom.custom_css:"";
+  if(!custom||(custom.status!=="published"&&!preview))return "";
+  const css=preview?custom.custom_css:custom.published_custom_css;
+  return typeof css==="string"?css:"";
 }
 
 export function storefrontSections(store:Record<string,unknown>, preview=false):StoreSection[]|null{
   const custom=activeCustomTheme(store);
-  if(!custom)return null;
+  if(!custom||(custom.status!=="published"&&!preview))return null;
   const layout=(preview?custom.draft_layout:custom.published_layout) as {home?:StoreSection[]}|undefined;
   const sections=layout?.home;
   return Array.isArray(sections)&&sections.length?sections:null;
