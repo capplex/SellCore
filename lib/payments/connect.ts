@@ -56,7 +56,7 @@ export async function createStripeConnectOnboarding(storeId: string, merchantId:
   const appUrl = serverEnv().NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
   const link = await stripe.accountLinks.create({
     account: payment.provider_account_id,
-    refresh_url: `${appUrl}/dashboard/payments?stripe_refresh=1`,
+    refresh_url: `${appUrl}/api/payments/stripe/connect/refresh?store=${encodeURIComponent(storeId)}`,
     return_url: `${appUrl}/api/payments/stripe/connect/return?store=${encodeURIComponent(storeId)}`,
     type: "account_onboarding",
   });
