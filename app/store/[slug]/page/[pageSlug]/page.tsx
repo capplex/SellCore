@@ -28,7 +28,7 @@ export default async function StorePage({
   const basePath=await storefrontBasePath(slug);
   const sections=(page.content??[]) as StoreSection[];
 
-  return <StoreShell store={store} basePath={basePath}>
+  return <StoreShell store={store} basePath={basePath} preview={preview}>
     <SectionRenderer sections={sections} store={store} products={products} reviews={reviews} basePath={basePath}/>
   </StoreShell>;
 }
