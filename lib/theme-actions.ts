@@ -78,11 +78,19 @@ export async function saveMerchantThemeAction(formData: FormData) {
   };
   const customCss = String(formData.get("customCss") || "").slice(0, 200000);
   const name = String(formData.get("name") || theme.name).trim().slice(0, 80);
+  const publishing = String(formData.get("intent") || "") === "publish";
+  const nextDraftLayout = { ...(theme.draft_layout ?? {}), home };
   const { error } = await db.from("merchant_themes").update({
     name,
     settings,
     custom_css: customCss,
-    draft_layout: { ...(theme.draft_layout ?? {}), home },
+    draft_layout: nextDraftLayout,
+    ...(publishing ? {
+      published_layout: nextDraftLayout,
+      published_settings: settings,
+      published_custom_css: customCss,
+      status: "published",
+    } : {}),
     updated_at: new Date().toISOString(),
   }).eq("id", themeId);
   if (error) throw new Error(error.message);
