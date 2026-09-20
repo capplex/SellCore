@@ -32,7 +32,14 @@ export function StoreShell({store,basePath,children,preview=false}:{store:Record
           <span>{String(store.name)}</span>
           <span>Powered By <Link href={sellCoreHome} className="font-medium underline-offset-4 hover:underline">SellCore</Link></span>
         </div>
-        <div className="flex flex-wrap gap-4">{(settings?.footer_links??[]).map((l,i)=><Link key={i} href={l.href}>{l.label}</Link>)}</div>
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
+          {(settings?.footer_links??[]).map((l,i)=><Link key={i} href={l.href}>{l.label}</Link>)}
+          <Link href={sellCoreHome+"/terms"}>Terms</Link>
+          <Link href={sellCoreHome+"/privacy"}>Privacy</Link>
+          <Link href={sellCoreHome+"/refunds"}>Refunds</Link>
+          <Link href={sellCoreHome+"/acceptable-use"}>Acceptable Use</Link>
+          <Link href={sellCoreHome+"/disclaimer"}>Disclaimer</Link>
+        </div>
       </div>
     </footer>
   </div>;
