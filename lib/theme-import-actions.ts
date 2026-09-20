@@ -86,7 +86,7 @@ export async function importThemeAction(formData:FormData){
       status:"draft",
     }).select("id").single();
     if(error||!created)throw new Error(error?.message||"THEME_IMPORT_FAILED");
-    await db.from("theme_settings").update({custom_theme_id:created.id,settings}).eq("store_id",storeId);
+    await db.from("theme_settings").update({custom_theme_id:created.id}).eq("store_id",storeId);
     revalidatePath("/dashboard/themes");
     redirect("/dashboard/themes/"+created.id);
   }
