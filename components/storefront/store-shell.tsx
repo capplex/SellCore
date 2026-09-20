@@ -1,13 +1,15 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Search, ShoppingBag } from "lucide-react";
-import { customThemeCss, storefrontThemeSettings, storefrontThemeSlug, themeVars } from "@/lib/storefront";
+import { customThemeCss, storeAssetPublicUrl, storefrontThemeSettings, storefrontThemeSlug, themeVars } from "@/lib/storefront";
 
 function storeHref(basePath:string,path=""){return basePath ? basePath+path : (path || "/");}
 function storeLink(basePath:string,href:string){return href.startsWith("/")?storeHref(basePath,href):href;}
 
 export function StoreShell({store,basePath,children,preview=false}:{store:Record<string,unknown>;basePath:string;children:React.ReactNode;preview?:boolean}){
-  const settings=(Array.isArray(store.store_settings)?store.store_settings[0]:store.store_settings) as {header_links?:{label:string;href:string}[];footer_links?:{label:string;href:string}[]} | null;
+  const settings=(Array.isArray(store.store_settings)?store.store_settings[0]:store.store_settings) as {header_links?:{label:string;href:string}[];footer_links?:{label:string;href:string}[];logo_path?:string|null;favicon_path?:string|null} | null;
   const sellCoreHome=(process.env.NEXT_PUBLIC_APP_URL||"https://sellcore.shop").replace(/\/$/,"");
+  const logoUrl=settings?.logo_path?storeAssetPublicUrl(settings.logo_path):null;
   const themeSettings=storefrontThemeSettings(store,preview);
   const themeSlug=themeSettings.stylePreset||storefrontThemeSlug(store);
   const headerStyle=themeSettings.headerStyle||"standard";
@@ -27,7 +29,7 @@ export function StoreShell({store,basePath,children,preview=false}:{store:Record
     {css&&<style dangerouslySetInnerHTML={{__html:css}}/>}
     <header className="border-b border-white/10">
       <div className={headerInner}>
-        <Link href={storeHref(basePath)} className="text-lg font-semibold tracking-tight">{String(store.name)}</Link>
+        <Link href={storeHref(basePath)} className="inline-flex min-h-9 items-center text-lg font-semibold tracking-tight" aria-label={String(store.name)}>{logoUrl?<Image src={logoUrl} alt={String(store.name)} width={220} height={72} className="max-h-10 w-auto object-contain"/>:String(store.name)}</Link>
         <nav className="hidden gap-5 text-sm opacity-70 md:flex">{(settings?.header_links??[]).map((l,i)=><Link key={i} href={storeLink(basePath,l.href)}>{l.label}</Link>)}</nav>
         <div className="flex items-center gap-2">
           <Link href={storeHref(basePath)+"?search=1"} aria-label="Search" className="rounded-lg border border-white/10 p-2"><Search size={17}/></Link>
