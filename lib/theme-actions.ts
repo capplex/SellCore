@@ -81,7 +81,7 @@ export async function saveMerchantThemeAction(formData: FormData) {
     updated_at: new Date().toISOString(),
   }).eq("id", themeId);
   if (error) throw new Error(error.message);
-  await db.from("theme_settings").update({ settings, custom_theme_id: themeId }).eq("store_id", theme.store_id);
+  await db.from("theme_settings").update({ custom_theme_id: themeId }).eq("store_id", theme.store_id);
   revalidatePath(`/dashboard/themes/${themeId}`);
   revalidatePath("/dashboard/themes");
   revalidatePath("/store", "layout");
@@ -99,7 +99,7 @@ export async function publishMerchantThemeAction(formData: FormData) {
     updated_at: new Date().toISOString(),
   }).eq("id", themeId);
   if (error) throw new Error(error.message);
-  await db.from("theme_settings").update({ custom_theme_id: themeId, settings: theme.settings }).eq("store_id", theme.store_id);
+  await db.from("theme_settings").update({ custom_theme_id: themeId }).eq("store_id", theme.store_id);
   revalidatePath("/store", "layout");
   revalidatePath("/dashboard/themes");
   revalidatePath(`/dashboard/themes/${themeId}`);
