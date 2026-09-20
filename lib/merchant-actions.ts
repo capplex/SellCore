@@ -29,7 +29,22 @@ export async function moderateReviewAction(formData:FormData){const {merchantId}
 
 export async function updateServiceStatusAction(formData:FormData){const {merchantId}=await requireMerchant();const id=String(formData.get("fulfillmentId"));const status=String(formData.get("status"));if(!["pending","paid","in_progress","awaiting_customer","completed","cancelled","refunded"].includes(status))throw new Error("INVALID_STATUS");const db=createSupabaseAdminClient();const {data}=await db.from("service_fulfillments").select("id,order_items!inner(orders!inner(store_id,stores!inner(merchant_id)))").eq("id",id).eq("order_items.orders.stores.merchant_id",merchantId).maybeSingle();if(!data)throw new Error("FORBIDDEN");await db.from("service_fulfillments").update({status,merchant_notes:String(formData.get("notes")||"")||null}).eq("id",id);revalidatePath("/dashboard/fulfillment");}
 
-export async function connectStripeAction(formData:FormData){const {merchantId}=await requireMerchant();const url=await createStripeConnectOnboarding(String(formData.get("storeId")),merchantId);redirect(url);}
+export async function connectStripeAction(formData:FormData){
+  const {merchantId}=await requireMerchant();
+  let url:string;
+  try{
+    url=await createStripeConnectOnboarding(String(formData.get("storeId")),merchantId);
+  }catch(error){
+    const message=error instanceof Error?error.message:"";
+    const code=
+      message.includes("STRIPE_SECRET_KEY")?"not_configured":
+      /sign(ed)? up for connect|connect platform|platform profile/i.test(message)?"connect_not_enabled":
+      /api key|authentication/i.test(message)?"invalid_key":
+      "connect_failed";
+    redirect("/dashboard/payments?stripe_error="+encodeURIComponent(code));
+  }
+  redirect(url);
+}
 
 export async function refundOrderAction(formData:FormData){const {merchantId,user}=await requireMerchant();const orderId=String(formData.get("orderId"));const db=createSupabaseAdminClient();const {data:order}=await db.from("orders").select("*,stores!inner(merchant_id)").eq("id",orderId).eq("stores.merchant_id",merchantId).single();if(!order||order.payment_status!=="paid")throw new Error("ORDER_NOT_REFUNDABLE");const {data:account}=await db.from("payment_accounts").select("provider_account_id").eq("store_id",order.store_id).eq("provider","stripe").single();if(!account||!order.payment_provider_payment_id)throw new Error("PAYMENT_REFERENCE_MISSING");await getStripe().refunds.create({payment_intent:order.payment_provider_payment_id},{stripeAccount:account.provider_account_id});await db.from("orders").update({payment_status:"refunded",fulfillment_status:"refunded"}).eq("id",orderId);await db.from("audit_logs").insert({merchant_id:merchantId,store_id:order.store_id,actor_user_id:user.id,action:"order.refunded",resource_type:"order",resource_id:orderId});revalidatePath(`/dashboard/orders/${orderId}`);}
 
