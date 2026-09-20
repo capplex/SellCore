@@ -127,6 +127,7 @@ export async function createStoreCheckout(params: { storeSlug: string; email: st
   try {
     const session = await stripe.checkout.sessions.create({
       mode,
+      // Stripe Checkout uses the connected account's dynamic payment-method configuration.
       customer_email: customer.email,
       line_items: lineItems,
       discounts,

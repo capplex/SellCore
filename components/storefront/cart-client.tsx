@@ -117,9 +117,9 @@ export function CartClient({ storeSlug }: { storeSlug: string }) {
         <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Name (optional)" className="border-white/10 bg-black/30"/>
         <input value={coupon} onChange={(event) => setCoupon(event.target.value)} placeholder="Coupon code" className="border-white/10 bg-black/30"/>
         <div className="flex justify-between border-t border-white/10 pt-4"><span className="opacity-60">Subtotal</span><span className="font-semibold">{formatMoney(total, currency)}</span></div>
-        <button onClick={() => void checkout()} disabled={!email} className="w-full rounded-[var(--radius)] bg-[var(--accent)] px-4 py-3 font-medium text-white disabled:opacity-40">Continue to Stripe</button>
+        <button onClick={() => void checkout()} disabled={!email} className="w-full rounded-[var(--radius)] bg-[var(--accent)] px-4 py-3 font-medium text-white disabled:opacity-40">Continue to secure checkout</button>
         {error && <p className="text-sm text-red-300">{error}</p>}
-        <p className="text-xs leading-5 opacity-45">Final price, coupon validity and inventory are recalculated on the server before Stripe Checkout is created.</p>
+        <p className="text-xs leading-5 opacity-45">Final price, coupon validity and inventory are recalculated on the server. Eligible card, Apple Pay, Google Pay, Cash App Pay and stablecoin options are shown by Stripe for the buyer and connected merchant.</p>
       </div>
     </aside>
   </div>;

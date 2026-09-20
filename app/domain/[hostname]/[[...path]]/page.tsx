@@ -45,7 +45,7 @@ export default async function CustomDomain({
       {sections
         ? <SectionRenderer sections={sections} store={store} products={products} reviews={reviews} basePath={basePath}/>
         : <>
-            <section className="mx-auto max-w-7xl px-5 py-20">
+            <section className="store-hero mx-auto max-w-7xl px-5 py-20">
               <p className="text-sm font-medium text-[var(--accent)]">DIGITAL STOREFRONT</p>
               <h1 className="mt-3 text-5xl font-semibold tracking-tight">{store.name}</h1>
               {store.description && <p className="mt-4 max-w-2xl opacity-60">{store.description}</p>}

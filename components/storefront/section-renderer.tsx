@@ -22,7 +22,7 @@ export function SectionRenderer({
 }) {
   const description = typeof store.description === "string" ? store.description : "";
   return <>{sections.map((section) => {
-    if (section.type === "hero") return <section key={section.id} className="mx-auto max-w-7xl px-5 py-16 md:py-24">
+    if (section.type === "hero") return <section key={section.id} className="store-hero mx-auto max-w-7xl px-5 py-16 md:py-24">
       {section.eyebrow && <p className="text-sm font-medium text-[var(--accent)]">{section.eyebrow}</p>}
       <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-tight md:text-6xl">{section.heading || String(store.name)}</h1>
       {(section.text || description) && <p className="mt-5 max-w-2xl text-lg leading-8 opacity-65">{section.text || description}</p>}

@@ -71,6 +71,10 @@ export async function saveMerchantThemeAction(formData: FormData) {
     headerStyle: String(formData.get("headerStyle") || "standard"),
     cardStyle: String(formData.get("cardStyle") || "bordered"),
     productLayout: String(formData.get("productLayout") || "grid"),
+    stylePreset: String(formData.get("stylePreset") || "dark"),
+    backgroundStyle: String(formData.get("backgroundStyle") || "solid"),
+    buttonStyle: String(formData.get("buttonStyle") || "solid"),
+    motion: String(formData.get("motion") || "subtle"),
   };
   const customCss = String(formData.get("customCss") || "").slice(0, 200000);
   const name = String(formData.get("name") || theme.name).trim().slice(0, 80);

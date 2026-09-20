@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 
 export type StoreSection = {
@@ -21,6 +21,10 @@ function makeSection(type: StoreSection["type"]): StoreSection {
 export function SectionBuilder({ name, initialSections }: { name: string; initialSections: StoreSection[] }) {
   const [sections, setSections] = useState<StoreSection[]>(initialSections);
   const serialized = useMemo(() => JSON.stringify(sections), [sections]);
+
+  useEffect(()=>{
+    window.dispatchEvent(new CustomEvent("sellcore:theme-sections",{detail:sections}));
+  },[sections]);
 
   function patch(id: string, patch: Partial<StoreSection>) {
     setSections((items) => items.map((item) => item.id === id ? { ...item, ...patch } : item));

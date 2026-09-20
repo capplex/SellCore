@@ -4,6 +4,8 @@ import { getDashboardContext } from "@/lib/dashboard-context";
 import { SectionBuilder, type StoreSection } from "@/components/dashboard/section-builder";
 import { deleteMerchantThemeAction, publishMerchantThemeAction, saveMerchantThemeAction } from "@/lib/theme-actions";
 import { storefrontPathUrl } from "@/lib/storefront-routing";
+import { ThemeLivePreview } from "@/components/dashboard/theme-live-preview";
+import { formatMoney } from "@/lib/utils";
 
 type ImportReport = {
   imported?: string[];
@@ -23,6 +25,12 @@ export default async function ThemeEditor({params}:{params:Promise<{id:string}>}
   const layout=(theme.draft_layout??{}) as {home?:StoreSection[]};
   const importReport=(theme.import_report??{}) as ImportReport;
   const preview=storefrontPathUrl(ctx.store.slug)+"?preview=1";
+  const {data:previewProducts}=await ctx.db.from("products").select("id,name,price_minor,currency").eq("store_id",ctx.store.id).eq("status","active").limit(4);
+  const previewSettings={
+    accent:settings.accent||"#E50914",background:settings.background||"#050505",text:settings.text||"#F5F5F5",radius:settings.radius||"8px",font:settings.font||"Manrope",
+    headerStyle:settings.headerStyle||"standard",cardStyle:settings.cardStyle||"bordered",productLayout:settings.productLayout||settings.layout||"grid",
+    stylePreset:settings.stylePreset||"dark",backgroundStyle:settings.backgroundStyle||"solid",buttonStyle:settings.buttonStyle||"solid",motion:settings.motion||"subtle",
+  };
 
   return <>
     <div className="flex flex-wrap items-start justify-between gap-4">
@@ -40,9 +48,10 @@ export default async function ThemeEditor({params}:{params:Promise<{id:string}>}
       </div>
     </div>
 
-    <form action={saveMerchantThemeAction} className="mt-6 grid gap-5 xl:grid-cols-[1fr_360px]">
+    <form id="theme-editor-form" action={saveMerchantThemeAction} className="mt-6 grid gap-5 xl:grid-cols-[1fr_360px]">
       <input type="hidden" name="themeId" value={theme.id}/>
       <div className="space-y-5">
+        <ThemeLivePreview formId="theme-editor-form" storeName={ctx.store.name} storeDescription={ctx.store.description||""} initialSettings={previewSettings} initialSections={layout.home??[]} products={(previewProducts??[]).map((product)=>({id:product.id,name:product.name,price:formatMoney(product.price_minor,product.currency)}))}/>
         <section className="rounded-xl border border-sc-border bg-sc-card p-5">
           <h2 className="font-semibold">Homepage sections</h2>
           <p className="mt-1 text-sm text-sc-secondary">Add, remove and reorder storefront sections.</p>
@@ -69,6 +78,10 @@ export default async function ThemeEditor({params}:{params:Promise<{id:string}>}
             <label className="text-sm">Header<select name="headerStyle" defaultValue={settings.headerStyle||"standard"}><option value="standard">Standard</option><option value="centered">Centered</option><option value="compact">Compact</option></select></label>
             <label className="text-sm">Product cards<select name="cardStyle" defaultValue={settings.cardStyle||"bordered"}><option value="bordered">Bordered</option><option value="flat">Flat</option><option value="editorial">Editorial</option></select></label>
             <label className="text-sm">Product layout<select name="productLayout" defaultValue={settings.productLayout||settings.layout||"grid"}><option value="grid">Grid</option><option value="list">List</option></select></label>
+            <label className="text-sm">Style preset<select name="stylePreset" defaultValue={settings.stylePreset||"dark"}><option value="minimal">Airy minimal</option><option value="dark">Midnight glow</option><option value="editorial">Bold editorial</option><option value="modern">Aurora glass</option><option value="technical">Pixel grid</option></select></label>
+            <label className="text-sm">Background<select name="backgroundStyle" defaultValue={settings.backgroundStyle||"solid"}><option value="solid">Solid</option><option value="aurora">Aurora gradient</option><option value="grid">Fine grid</option></select></label>
+            <label className="text-sm">Buttons<select name="buttonStyle" defaultValue={settings.buttonStyle||"solid"}><option value="solid">Solid</option><option value="pill">Pill</option><option value="outline">Outline</option></select></label>
+            <label className="text-sm">Motion<select name="motion" defaultValue={settings.motion||"subtle"}><option value="subtle">Subtle</option><option value="playful">Playful hover</option><option value="none">None</option></select></label>
             <button className="mt-2 rounded-lg bg-sc-red px-4 py-2.5 text-sm font-medium">Save draft</button>
           </div>
         </section>

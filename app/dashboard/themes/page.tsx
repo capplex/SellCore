@@ -4,6 +4,14 @@ import { selectThemeAction } from "@/lib/merchant-actions";
 import { activateMerchantThemeAction, createMerchantThemeAction, duplicateMerchantThemeAction } from "@/lib/theme-actions";
 import { EmptyState } from "@/components/ui/empty-state";
 
+const themeLooks:Record<string,{canvas:string;accent:string;label:string}>={
+  minimal:{canvas:"bg-[#f4f1e9] text-[#171717]",accent:"bg-[#e50914]",label:"Airy / Clean"},
+  dark:{canvas:"bg-[radial-gradient(circle_at_75%_0%,#5b0d13,#090909_48%)] text-white",accent:"bg-[#ff2632]",label:"Midnight / Glow"},
+  editorial:{canvas:"bg-[#efe8dc] text-[#18130f]",accent:"bg-[#8b0000]",label:"Bold / Magazine"},
+  modern:{canvas:"bg-[radial-gradient(circle_at_20%_0%,#522040,#0a0a12_48%,#101c2b)] text-white",accent:"bg-[#ff315a]",label:"Aurora / Glass"},
+  technical:{canvas:"bg-[#080808] text-[#f5f5f5]",accent:"bg-[#ff1a24]",label:"Grid / Pixel"},
+};
+
 export default async function Themes(){
   const ctx=await getDashboardContext();
   if(!ctx.store)return <EmptyState title="No store"/>;
@@ -60,14 +68,23 @@ export default async function Themes(){
       <h2 className="font-semibold">SellCore themes</h2>
       <p className="mt-1 text-sm text-sc-secondary">Official starting points. Selecting one switches away from a custom theme.</p>
       <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        {themes?.map((t)=><form action={selectThemeAction} key={t.id} className={"rounded-xl border p-4 "+(!activeCustomId&&current?.theme_id===t.id?"border-sc-red bg-[#130809]":"border-sc-border bg-sc-card")}>
+        {themes?.map((t)=>{const look=themeLooks[t.slug]??themeLooks.dark;return <form action={selectThemeAction} key={t.id} className={"overflow-hidden rounded-xl border "+(!activeCustomId&&current?.theme_id===t.id?"border-sc-red bg-[#130809]":"border-sc-border bg-sc-card")}>
           <input type="hidden" name="storeId" value={ctx.store.id}/>
           <input type="hidden" name="themeId" value={t.id}/>
-          <div className="font-medium">{t.name}</div>
-          <p className="mt-2 min-h-16 text-xs leading-5 text-sc-secondary">{t.description}</p>
-          <div className="mt-3 text-[11px] uppercase text-sc-muted">{t.is_advanced?"Advanced":"Basic"}</div>
-          <button className="mt-4 w-full rounded-lg border border-sc-border py-2 text-sm">{!activeCustomId&&current?.theme_id===t.id?"Selected":"Use theme"}</button>
-        </form>)}
+          <div className={`relative h-40 overflow-hidden p-4 ${look.canvas}`}>
+            {t.slug==="technical"&&<div className="absolute inset-0 opacity-20 [background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)] [background-size:18px_18px]"/>}
+            <div className="relative flex items-center justify-between text-[8px] font-semibold"><span>YOUR STORE</span><span>SHOP · CART</span></div>
+            <div className={`relative mt-7 ${t.slug==="minimal"?"text-center":t.slug==="editorial"?"text-3xl leading-none tracking-[-.08em]":""}`}><div className="text-xl font-semibold">Make it yours.</div><div className="mt-2 text-[8px] opacity-55">A storefront with actual personality.</div></div>
+            <div className="relative mt-5 flex gap-2">{[0,1,2].map((item)=><span key={item} className={`h-7 flex-1 border border-current/10 ${t.slug==="modern"?"rounded-xl bg-white/10 backdrop-blur":t.slug==="editorial"?"bg-transparent":"rounded bg-current/5"}`}/>)}</div>
+            <span className={`absolute bottom-3 right-3 h-2.5 w-8 rounded-full ${look.accent}`}/>
+          </div>
+          <div className="p-4">
+            <div className="flex items-center justify-between gap-2"><div className="font-medium">{t.name}</div><span className="text-[9px] uppercase text-sc-muted">{look.label}</span></div>
+            <p className="mt-2 min-h-16 text-xs leading-5 text-sc-secondary">{t.description}</p>
+            <div className="mt-3 text-[11px] uppercase text-sc-muted">{t.is_advanced?"Advanced":"Basic"}</div>
+            <button className="mt-4 w-full rounded-lg border border-sc-border py-2 text-sm">{!activeCustomId&&current?.theme_id===t.id?"Selected":"Use theme"}</button>
+          </div>
+        </form>})}
       </div>
     </section>
   </>;

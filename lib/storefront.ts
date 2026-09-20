@@ -140,6 +140,13 @@ export function storefrontThemeSettings(store: Record<string, unknown>, preview=
   return activeThemeSettings(store, preview) ?? (ts.settings as Record<string,string>|undefined) ?? {};
 }
 
+export function storefrontThemeSlug(store: Record<string, unknown>) {
+  const ts=themeSettingsRecord(store);
+  const raw=ts.themes;
+  const theme=Array.isArray(raw)?raw[0]:raw;
+  return typeof (theme as {slug?:unknown}|null)?.slug==="string" ? (theme as {slug:string}).slug : "dark";
+}
+
 export function customThemeCss(store:Record<string,unknown>, preview=false){
   const custom=activeCustomTheme(store);
   if(!custom||(custom.status!=="published"&&!preview))return "";

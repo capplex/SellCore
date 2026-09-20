@@ -21,7 +21,7 @@ export default async function StoreHome({params,searchParams}:{params:Promise<{s
     {sections
       ? <SectionRenderer sections={sections} store={store} products={products} reviews={reviews} basePath={basePath}/>
       : <>
-          <section className="mx-auto max-w-7xl px-5 py-16 md:py-24">
+          <section className="store-hero mx-auto max-w-7xl px-5 py-16 md:py-24">
             <p className="text-sm font-medium text-[var(--accent)]">DIGITAL STOREFRONT</p>
             <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight md:text-6xl">{store.name}</h1>
             {store.description&&<p className="mt-5 max-w-2xl text-lg opacity-60">{store.description}</p>}
