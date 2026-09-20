@@ -6,11 +6,11 @@ export function GET() {
   return NextResponse.json({
     ok: true,
     app: "SellCore",
-    build: "2026-09-20-variant-inventory",
+    build: "2026-09-20-typography",
   }, {
     headers: {
       "cache-control": "no-store",
-      "x-sellcore-build": "2026-09-20-variant-inventory",
+      "x-sellcore-build": "2026-09-20-typography",
     },
   });
 }

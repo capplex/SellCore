@@ -117,10 +117,18 @@ export function publicImageUrl(path:string){
 export function themeVars(store:Record<string,unknown>, preview=false){
   const ts=themeSettingsRecord(store);
   const settings=activeThemeSettings(store, preview) ?? (ts.settings as Record<string,string>|undefined) ?? {};
+  const fontFamilies:Record<string,string>={
+    Manrope:'var(--font-manrope), "Segoe UI", sans-serif',
+    "Space Grotesk":'var(--font-space-grotesk), var(--font-manrope), "Segoe UI", sans-serif',
+    Sora:'var(--font-sora), var(--font-manrope), "Segoe UI", sans-serif',
+    "Plus Jakarta Sans":'var(--font-plus-jakarta-sans), var(--font-manrope), "Segoe UI", sans-serif',
+    "system-ui":'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  };
+  const selectedFont=settings.font||"Manrope";
   return {
     background:settings.background||"#050505",
     color:settings.text||"#F5F5F5",
-    fontFamily:settings.font||"Manrope",
+    fontFamily:fontFamilies[selectedFont]||fontFamilies.Manrope,
     "--accent":settings.accent||"#E50914",
     "--radius":settings.radius||"8px",
     "--store-bg":settings.background||"#050505",
