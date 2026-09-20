@@ -1,18 +1,27 @@
-name: Build verify
+name: Verify and deploy SellCore
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: sellcore-production
+  cancel-in-progress: false
+
 jobs:
-  build:
+  deploy:
+    name: Verify and deploy existing Worker
     runs-on: ubuntu-latest
+    environment: production
     env:
       NEXT_PUBLIC_APP_URL: https://sellcore.shop
       NEXT_PUBLIC_PLATFORM_DOMAIN: sellcore.shop
-      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+      NEXT_PUBLIC_SUPABASE_URL: https://owhljndsrjxnfrtyfdii.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_7WJgAmRMfRD62t4ekOzSzw_odZh1VXA
       SUPABASE_SERVICE_ROLE_KEY: test-service-role-key
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
       STRIPE_SECRET_KEY: sk_test_placeholder
@@ -26,7 +35,19 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-      - run: npm install
-      - run: npm run cf:build
+      - name: Install pinned dependencies
+        run: npm ci
+      - name: Verify application
+        run: npm run verify
+      - name: Build the OpenNext Worker
+        run: npm run cf:build
       - name: Verify Worker entrypoint
         run: test -f .open-next/worker.js
+      - name: Deploy to the existing sellcore Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          npx wrangler deploy --keep-vars

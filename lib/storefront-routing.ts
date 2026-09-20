@@ -17,3 +17,8 @@ export function storefrontUrl(slug: string) {
   const platform = hostnameOnly(process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "sellcore.shop");
   return `https://${slug}.${platform}`;
 }
+
+export function storefrontPathUrl(slug: string) {
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://sellcore.shop").replace(/\/$/, "");
+  return `${appUrl}/store/${encodeURIComponent(slug)}`;
+}

@@ -11,4 +11,12 @@ a { color: inherit; text-decoration: none; }
 input, textarea, select { background:#0A0A0A; color:#F5F5F5; border:1px solid #2C2C2C; border-radius:8px; padding:.7rem .8rem; width:100%; }
 input:focus, textarea:focus, select:focus { outline:2px solid #E50914; outline-offset:1px; }
 button { font: inherit; }
+[data-card-style="flat"] .store-product-card { border-color:transparent; background:transparent; }
+[data-card-style="flat"] .store-product-card > div:last-child { padding-left:0; padding-right:0; }
+[data-card-style="editorial"] .store-product-card { border-color:transparent; border-radius:0; background:transparent; }
+[data-card-style="editorial"] .store-product-card > div:first-child { aspect-ratio:3/4; }
+[data-card-style="editorial"] .store-product-card > div:last-child { padding-left:0; padding-right:0; }
+[data-store-layout="list"] .store-product-grid { grid-template-columns:1fr; }
+[data-store-layout="list"] .store-product-card { display:grid; grid-template-columns:minmax(9rem,14rem) 1fr; }
+[data-store-layout="list"] .store-product-card > div:first-child { aspect-ratio:4/3; }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; } }

@@ -70,6 +70,7 @@ export async function saveMerchantThemeAction(formData: FormData) {
     font: String(formData.get("font") || "Manrope"),
     headerStyle: String(formData.get("headerStyle") || "standard"),
     cardStyle: String(formData.get("cardStyle") || "bordered"),
+    productLayout: String(formData.get("productLayout") || "grid"),
   };
   const customCss = String(formData.get("customCss") || "").slice(0, 200000);
   const name = String(formData.get("name") || theme.name).trim().slice(0, 80);
@@ -109,7 +110,7 @@ export async function activateMerchantThemeAction(formData: FormData) {
   const { merchantId } = await requireMerchant();
   const themeId = String(formData.get("themeId"));
   const { db, theme } = await ownedTheme(themeId, merchantId);
-  await db.from("theme_settings").update({ custom_theme_id: themeId, settings: theme.settings }).eq("store_id", theme.store_id);
+  await db.from("theme_settings").update({ custom_theme_id: themeId }).eq("store_id", theme.store_id);
   revalidatePath("/dashboard/themes");
   revalidatePath("/store", "layout");
 }
@@ -118,7 +119,9 @@ export async function duplicateMerchantThemeAction(formData: FormData) {
   const { merchantId } = await requireMerchant();
   const themeId = String(formData.get("themeId"));
   const { db, theme } = await ownedTheme(themeId, merchantId);
-  const { id: _id, created_at: _created, updated_at: _updated, ...copy } = theme;
+  const copy = Object.fromEntries(
+    Object.entries(theme).filter(([key]) => !["id", "created_at", "updated_at"].includes(key)),
+  );
   const { data: created, error } = await db.from("merchant_themes").insert({
     ...copy,
     name: `${theme.name} copy`.slice(0, 80),

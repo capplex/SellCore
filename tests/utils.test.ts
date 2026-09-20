@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatMoney, slugify, uniqueById } from "@/lib/utils";
+import { formatMoney, slugify, uniqueById } from "../lib/utils";
 
 describe("utility invariants", () => {
   it("deduplicates reviews and other records by stable id", () => {

@@ -1,24 +1,29 @@
 import Link from "next/link";
 import { Search, ShoppingBag } from "lucide-react";
-import { activeCustomTheme, customThemeCss, themeVars } from "@/lib/storefront";
+import { customThemeCss, storefrontThemeSettings, themeVars } from "@/lib/storefront";
 
 function storeHref(basePath:string,path=""){return basePath ? basePath+path : (path || "/");}
+function storeLink(basePath:string,href:string){return href.startsWith("/")?storeHref(basePath,href):href;}
 
 export function StoreShell({store,basePath,children,preview=false}:{store:Record<string,unknown>;basePath:string;children:React.ReactNode;preview?:boolean}){
   const settings=(Array.isArray(store.store_settings)?store.store_settings[0]:store.store_settings) as {header_links?:{label:string;href:string}[];footer_links?:{label:string;href:string}[]} | null;
-  const sellCoreHome=process.env.NEXT_PUBLIC_APP_URL||"https://sellcore.shop";
-  const custom=activeCustomTheme(store);
-  const themeSettings=((custom?.settings as Record<string,string>|undefined)??{});
+  const sellCoreHome=(process.env.NEXT_PUBLIC_APP_URL||"https://sellcore.shop").replace(/\/$/,"");
+  const themeSettings=storefrontThemeSettings(store,preview);
   const headerStyle=themeSettings.headerStyle||"standard";
   const css=customThemeCss(store,preview);
   const headerInner=headerStyle==="centered"?"mx-auto flex max-w-7xl flex-col items-center gap-4 px-5 py-5 md:flex-row md:justify-between":headerStyle==="compact"?"mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3":"mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5";
 
-  return <div style={themeVars(store,preview)} className="flex min-h-screen flex-col bg-[var(--store-bg)]">
+  return <div
+    style={themeVars(store,preview)}
+    data-card-style={themeSettings.cardStyle||"bordered"}
+    data-store-layout={themeSettings.productLayout||themeSettings.layout||"grid"}
+    className="flex min-h-screen flex-col bg-[var(--store-bg)]"
+  >
     {css&&<style dangerouslySetInnerHTML={{__html:css}}/>}
     <header className="border-b border-white/10">
       <div className={headerInner}>
         <Link href={storeHref(basePath)} className="text-lg font-semibold tracking-tight">{String(store.name)}</Link>
-        <nav className="hidden gap-5 text-sm opacity-70 md:flex">{(settings?.header_links??[]).map((l,i)=><Link key={i} href={l.href}>{l.label}</Link>)}</nav>
+        <nav className="hidden gap-5 text-sm opacity-70 md:flex">{(settings?.header_links??[]).map((l,i)=><Link key={i} href={storeLink(basePath,l.href)}>{l.label}</Link>)}</nav>
         <div className="flex items-center gap-2">
           <Link href={storeHref(basePath)+"?search=1"} aria-label="Search" className="rounded-lg border border-white/10 p-2"><Search size={17}/></Link>
           <Link href={storeHref(basePath,"/cart")} aria-label="Cart" className="rounded-lg border border-white/10 p-2"><ShoppingBag size={17}/></Link>
@@ -33,7 +38,7 @@ export function StoreShell({store,basePath,children,preview=false}:{store:Record
           <span>Powered By <Link href={sellCoreHome} className="font-medium underline-offset-4 hover:underline">SellCore</Link></span>
         </div>
         <div className="flex flex-wrap gap-x-4 gap-y-2">
-          {(settings?.footer_links??[]).map((l,i)=><Link key={i} href={l.href}>{l.label}</Link>)}
+          {(settings?.footer_links??[]).map((l,i)=><Link key={i} href={storeLink(basePath,l.href)}>{l.label}</Link>)}
           <Link href={sellCoreHome+"/terms"}>Terms</Link>
           <Link href={sellCoreHome+"/privacy"}>Privacy</Link>
           <Link href={sellCoreHome+"/refunds"}>Refunds</Link>

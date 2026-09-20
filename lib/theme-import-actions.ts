@@ -5,6 +5,15 @@ import { revalidatePath } from "next/cache";
 import { unzipSync } from "fflate";
 import { requireMerchant } from "@/lib/auth/session";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import type { StoreSection } from "@/components/dashboard/section-builder";
+
+type ImportReport = {
+  source_platform?: string;
+  file_count?: number;
+  imported: string[];
+  converted: string[];
+  warnings: string[];
+};
 
 const textExtensions=[".html",".htm",".css",".js",".ts",".tsx",".jsx",".json",".njk",".nunjucks",".liquid",".twig",".md"];
 
@@ -30,7 +39,7 @@ function detectPlatform(files:string[],hint:string){
 
 function layoutFromSource(source:string){
   const lower=source.toLowerCase();
-  const sections:any[]=[
+  const sections:StoreSection[]=[
     {id:"hero",type:"hero",eyebrow:"",heading:"",text:""},
     {id:"products",type:"products",heading:"Products"},
   ];
@@ -57,14 +66,14 @@ export async function importThemeAction(formData:FormData){
 
   let platform=hint;
   let customCss="";
-  let sourceFiles:Record<string,string>={};
+  const sourceFiles:Record<string,string>={};
   let sourceText="";
-  let report:any={ imported:[], converted:[], warnings:[] };
+  let report:ImportReport={ imported:[], converted:[], warnings:[] };
 
   if(filename.endsWith(".json")){
-    const parsed=JSON.parse(decode(bytes));
+    const parsed=JSON.parse(decode(bytes)) as Record<string,unknown>;
     const settings=typeof parsed.settings==="object"&&parsed.settings?parsed.settings:{};
-    const home=Array.isArray(parsed.home)?parsed.home:Array.isArray(parsed.sections)?parsed.sections:layoutFromSource(JSON.stringify(parsed));
+    const home=(Array.isArray(parsed.home)?parsed.home:Array.isArray(parsed.sections)?parsed.sections:layoutFromSource(JSON.stringify(parsed))) as StoreSection[];
     customCss=typeof parsed.customCss==="string"?parsed.customCss.slice(0,200000):"";
     platform=platform==="auto"?"sellcore":platform;
     report.imported.push("JSON theme package");
@@ -72,7 +81,7 @@ export async function importThemeAction(formData:FormData){
     const {data:created,error}=await db.from("merchant_themes").insert({
       merchant_id:merchantId,
       store_id:storeId,
-      name:cleanName(parsed.name||file.name.replace(/\.json$/i,"")),
+      name:cleanName(String(parsed.name||file.name.replace(/\.json$/i,""))),
       mode:"visual",
       source_platform:platform,
       settings,
@@ -93,7 +102,14 @@ export async function importThemeAction(formData:FormData){
 
   if(!filename.endsWith(".zip"))throw new Error("THEME_FILE_TYPE_UNSUPPORTED");
 
-  const archive=unzipSync(bytes);
+  let archiveEntries=0;
+  let expandedBytes=0;
+  const archive=unzipSync(bytes,{filter(info){
+    archiveEntries+=1;
+    expandedBytes+=info.originalSize;
+    if(archiveEntries>500||expandedBytes>20*1024*1024)throw new Error("THEME_ARCHIVE_TOO_LARGE");
+    return !info.name.endsWith("/")&&info.originalSize<=1024*1024;
+  }});
   const names=Object.keys(archive).filter((name)=>!name.endsWith("/"));
   platform=detectPlatform(names,hint);
 

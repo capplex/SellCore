@@ -3,7 +3,13 @@ import { notFound } from "next/navigation";
 import { getDashboardContext } from "@/lib/dashboard-context";
 import { SectionBuilder, type StoreSection } from "@/components/dashboard/section-builder";
 import { deleteMerchantThemeAction, publishMerchantThemeAction, saveMerchantThemeAction } from "@/lib/theme-actions";
-import { storefrontUrl } from "@/lib/storefront-routing";
+import { storefrontPathUrl } from "@/lib/storefront-routing";
+
+type ImportReport = {
+  imported?: string[];
+  converted?: string[];
+  warnings?: string[];
+};
 
 export default async function ThemeEditor({params}:{params:Promise<{id:string}>}){
   const {id}=await params;
@@ -15,7 +21,8 @@ export default async function ThemeEditor({params}:{params:Promise<{id:string}>}
 
   const settings=(theme.settings??{}) as Record<string,string>;
   const layout=(theme.draft_layout??{}) as {home?:StoreSection[]};
-  const preview=storefrontUrl(ctx.store.slug)+"?preview=1";
+  const importReport=(theme.import_report??{}) as ImportReport;
+  const preview=storefrontPathUrl(ctx.store.slug)+"?preview=1";
 
   return <>
     <div className="flex flex-wrap items-start justify-between gap-4">
@@ -61,6 +68,7 @@ export default async function ThemeEditor({params}:{params:Promise<{id:string}>}
             <label className="text-sm">Font<select name="font" defaultValue={settings.font||"Manrope"}><option>Manrope</option><option>Space Grotesk</option><option>Sora</option><option>Plus Jakarta Sans</option><option>system-ui</option></select></label>
             <label className="text-sm">Header<select name="headerStyle" defaultValue={settings.headerStyle||"standard"}><option value="standard">Standard</option><option value="centered">Centered</option><option value="compact">Compact</option></select></label>
             <label className="text-sm">Product cards<select name="cardStyle" defaultValue={settings.cardStyle||"bordered"}><option value="bordered">Bordered</option><option value="flat">Flat</option><option value="editorial">Editorial</option></select></label>
+            <label className="text-sm">Product layout<select name="productLayout" defaultValue={settings.productLayout||settings.layout||"grid"}><option value="grid">Grid</option><option value="list">List</option></select></label>
             <button className="mt-2 rounded-lg bg-sc-red px-4 py-2.5 text-sm font-medium">Save draft</button>
           </div>
         </section>
@@ -68,9 +76,9 @@ export default async function ThemeEditor({params}:{params:Promise<{id:string}>}
         {theme.source_platform&&theme.source_platform!=="sellcore"&&<section className="rounded-xl border border-sc-border bg-sc-card p-5">
           <h2 className="font-semibold">Import report</h2>
           <p className="mt-1 text-xs uppercase text-sc-muted">{theme.source_platform}</p>
-          {Array.isArray((theme.import_report as any)?.imported)&&<div className="mt-4"><div className="text-xs font-semibold uppercase text-sc-muted">Imported</div><ul className="mt-2 space-y-1 text-sm text-sc-secondary">{((theme.import_report as any).imported as string[]).map((item,index)=><li key={index}>• {item}</li>)}</ul></div>}
-          {Array.isArray((theme.import_report as any)?.converted)&&<div className="mt-4"><div className="text-xs font-semibold uppercase text-sc-muted">Converted</div><ul className="mt-2 space-y-1 text-sm text-sc-secondary">{((theme.import_report as any).converted as string[]).map((item,index)=><li key={index}>• {item}</li>)}</ul></div>}
-          {Array.isArray((theme.import_report as any)?.warnings)&&<div className="mt-4"><div className="text-xs font-semibold uppercase text-sc-muted">Needs attention</div><ul className="mt-2 space-y-1 text-sm text-amber-200/80">{((theme.import_report as any).warnings as string[]).map((item,index)=><li key={index}>• {item}</li>)}</ul></div>}
+          {Array.isArray(importReport.imported)&&<div className="mt-4"><div className="text-xs font-semibold uppercase text-sc-muted">Imported</div><ul className="mt-2 space-y-1 text-sm text-sc-secondary">{importReport.imported.map((item,index)=><li key={index}>• {item}</li>)}</ul></div>}
+          {Array.isArray(importReport.converted)&&<div className="mt-4"><div className="text-xs font-semibold uppercase text-sc-muted">Converted</div><ul className="mt-2 space-y-1 text-sm text-sc-secondary">{importReport.converted.map((item,index)=><li key={index}>• {item}</li>)}</ul></div>}
+          {Array.isArray(importReport.warnings)&&<div className="mt-4"><div className="text-xs font-semibold uppercase text-sc-muted">Needs attention</div><ul className="mt-2 space-y-1 text-sm text-amber-200/80">{importReport.warnings.map((item,index)=><li key={index}>• {item}</li>)}</ul></div>}
         </section>}
 
         <section className="rounded-xl border border-red-950 bg-[#100708] p-5">

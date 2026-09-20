@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { ProductCard } from "@/components/storefront/product-card";
 import type { StoreSection } from "@/components/dashboard/section-builder";
+import type { StorefrontReview } from "@/lib/storefront";
 
-type Review = { id:string; rating:number; review_text:string; merchant_response:string|null; customers:{name:string|null}|null };
+function sectionHref(basePath: string, href: string) {
+  return href.startsWith("/") && basePath ? `${basePath}${href}` : href;
+}
 
 export function SectionRenderer({
   sections,
@@ -14,15 +17,16 @@ export function SectionRenderer({
   sections: StoreSection[];
   store: Record<string, unknown>;
   products: Record<string, unknown>[];
-  reviews: Review[];
+  reviews: StorefrontReview[];
   basePath: string;
 }) {
+  const description = typeof store.description === "string" ? store.description : "";
   return <>{sections.map((section) => {
     if (section.type === "hero") return <section key={section.id} className="mx-auto max-w-7xl px-5 py-16 md:py-24">
       {section.eyebrow && <p className="text-sm font-medium text-[var(--accent)]">{section.eyebrow}</p>}
       <h1 className="mt-3 max-w-4xl text-4xl font-semibold tracking-tight md:text-6xl">{section.heading || String(store.name)}</h1>
-      {(section.text || store.description) && <p className="mt-5 max-w-2xl text-lg leading-8 opacity-65">{section.text || String(store.description)}</p>}
-      {section.buttonLabel && section.buttonHref && <Link href={section.buttonHref} className="mt-7 inline-flex rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-white">{section.buttonLabel}</Link>}
+      {(section.text || description) && <p className="mt-5 max-w-2xl text-lg leading-8 opacity-65">{section.text || description}</p>}
+      {section.buttonLabel && section.buttonHref && <Link href={sectionHref(basePath, section.buttonHref)} className="mt-7 inline-flex rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-white">{section.buttonLabel}</Link>}
     </section>;
 
     if (section.type === "rich_text") return <section key={section.id} className="mx-auto max-w-4xl px-5 py-10">
@@ -32,7 +36,7 @@ export function SectionRenderer({
 
     if (section.type === "products") return <section key={section.id} className="mx-auto max-w-7xl px-5 py-12">
       <h2 className="mb-6 text-2xl font-semibold">{section.heading || "Products"}</h2>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{products.map((p) => <ProductCard key={String(p.id)} product={p} basePath={basePath}/>)}</div>
+      <div className="store-product-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{products.map((p) => <ProductCard key={String(p.id)} product={p} basePath={basePath}/>)}</div>
       {products.length === 0 && <div className="rounded-[var(--radius)] border border-dashed border-white/10 p-12 text-center opacity-60">No published products found.</div>}
     </section>;
 

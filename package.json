@@ -4,16 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "opennextjs-cloudflare build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:deploy": "opennextjs-cloudflare build && wrangler deploy --keep-vars",
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "next:build": "next build",
-    "deploy": "wrangler deploy"
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run lint && npm test && npm run typecheck",
+    "deploy": "wrangler deploy --keep-vars"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

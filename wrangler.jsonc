@@ -2,7 +2,7 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "sellcore",
   "main": ".open-next/worker.js",
-  "compatibility_date": "2026-09-19",
+  "compatibility_date": "2026-09-20",
   "compatibility_flags": ["nodejs_compat"],
   "keep_vars": true,
   "secrets": {
@@ -35,6 +35,7 @@
     "binding": "ASSETS"
   },
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "head_sampling_rate": 1
   }
 }

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getDashboardContext } from "@/lib/dashboard-context";
 import { SectionBuilder, type StoreSection } from "@/components/dashboard/section-builder";
 import { deletePageBuilderAction, updatePageBuilderAction } from "@/lib/page-actions";
-import { storefrontUrl } from "@/lib/storefront-routing";
+import { storefrontPathUrl } from "@/lib/storefront-routing";
 
 export default async function PageEditor({params}:{params:Promise<{id:string}>}){
   const {id}=await params;
@@ -14,7 +14,7 @@ export default async function PageEditor({params}:{params:Promise<{id:string}>})
   if(!page)notFound();
 
   const sections=(page.content??[]) as StoreSection[];
-  const preview=storefrontUrl(ctx.store.slug)+"/page/"+page.slug+"?preview=1";
+  const preview=storefrontPathUrl(ctx.store.slug)+"/page/"+page.slug+"?preview=1";
 
   return <>
     <div className="flex flex-wrap items-start justify-between gap-4">
