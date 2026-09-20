@@ -29,7 +29,7 @@ async function uploadAsset(db:ReturnType<typeof createSupabaseAdminClient>,store
   const max=kind==="logo"?2*1024*1024:512*1024;
   if(file.size<=0||file.size>max)throw new Error(kind==="logo"?"LOGO_TOO_LARGE":"FAVICON_TOO_LARGE");
 
-  const path=`${storeId}/${kind}.${ext}`;
+  const path=`${storeId}/${kind}-${Date.now()}.${ext}`;
   const {error}=await db.storage.from("store-assets").upload(path,file,{
     upsert:true,
     contentType:file.type,
@@ -55,14 +55,18 @@ export async function updateStoreBrandingAction(formData:FormData){
     if(logoPath)await db.storage.from("store-assets").remove([logoPath]).catch(()=>undefined);
     logoPath=null;
   }else if(logo instanceof File&&logo.size>0){
+    const previous=logoPath;
     logoPath=await uploadAsset(db,storeId,logo,"logo");
+    if(previous&&previous!==logoPath)await db.storage.from("store-assets").remove([previous]).catch(()=>undefined);
   }
 
   if(formData.get("removeFavicon")==="on"){
     if(faviconPath)await db.storage.from("store-assets").remove([faviconPath]).catch(()=>undefined);
     faviconPath=null;
   }else if(favicon instanceof File&&favicon.size>0){
+    const previous=faviconPath;
     faviconPath=await uploadAsset(db,storeId,favicon,"favicon");
+    if(previous&&previous!==faviconPath)await db.storage.from("store-assets").remove([previous]).catch(()=>undefined);
   }
 
   const {error}=await db.from("store_settings").upsert({
