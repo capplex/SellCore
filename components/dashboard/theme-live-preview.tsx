@@ -81,7 +81,7 @@ export function ThemeLivePreview({
   },[formId]);
 
   const previewStyle=useMemo(()=>({
-    background:settings.background,
+    backgroundColor:settings.background,
     color:settings.text,
     fontFamily:fonts[settings.font]||fonts.Manrope,
     "--accent":settings.accent,
