@@ -121,6 +121,7 @@ export async function activateMerchantThemeAction(formData: FormData) {
   const { merchantId } = await requireMerchant();
   const themeId = String(formData.get("themeId"));
   const { db, theme } = await ownedTheme(themeId, merchantId);
+  if(theme.status!=="published") throw new Error("THEME_NOT_PUBLISHED");
   await db.from("theme_settings").update({ custom_theme_id: themeId }).eq("store_id", theme.store_id);
   revalidatePath("/dashboard/themes");
   revalidatePath("/store", "layout");
