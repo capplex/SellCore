@@ -43,8 +43,11 @@ export async function createMerchantThemeAction(formData: FormData) {
     source_platform: "sellcore",
     base_theme_id: current?.theme_id ?? null,
     settings: current?.settings ?? {},
+    published_settings: current?.settings ?? {},
     draft_layout: { home: starterHome },
     published_layout: { home: starterHome },
+    custom_css: "",
+    published_custom_css: "",
     status: "draft",
   }).select("id").single();
   if (error || !created) throw new Error(error?.message || "THEME_CREATE_FAILED");
@@ -90,6 +93,8 @@ export async function publishMerchantThemeAction(formData: FormData) {
   const { db, theme } = await ownedTheme(themeId, merchantId);
   const { error } = await db.from("merchant_themes").update({
     published_layout: theme.draft_layout,
+    published_settings: theme.settings,
+    published_custom_css: theme.custom_css,
     status: "published",
     updated_at: new Date().toISOString(),
   }).eq("id", themeId);
