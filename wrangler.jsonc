@@ -5,6 +5,13 @@
   "compatibility_date": "2026-09-19",
   "compatibility_flags": ["nodejs_compat"],
   "keep_vars": true,
+  "secrets": {
+    "required": [
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "ENCRYPTION_KEY",
+      "CRON_SECRET"
+    ]
+  },
   "routes": [
     {
       "pattern": "sellcore.shop",
