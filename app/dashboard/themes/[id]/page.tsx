@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDashboardContext } from "@/lib/dashboard-context";
 import { SectionBuilder, type StoreSection } from "@/components/dashboard/section-builder";
-import { deleteMerchantThemeAction, publishMerchantThemeAction, saveMerchantThemeAction } from "@/lib/theme-actions";
+import { deleteMerchantThemeAction, saveMerchantThemeAction } from "@/lib/theme-actions";
 import { storefrontPathUrl } from "@/lib/storefront-routing";
 import { ThemeLivePreview } from "@/components/dashboard/theme-live-preview";
 import { formatMoney } from "@/lib/utils";
@@ -24,7 +24,7 @@ export default async function ThemeEditor({params}:{params:Promise<{id:string}>}
   const settings=(theme.settings??{}) as Record<string,string>;
   const layout=(theme.draft_layout??{}) as {home?:StoreSection[]};
   const importReport=(theme.import_report??{}) as ImportReport;
-  const preview=storefrontPathUrl(ctx.store.slug)+"?preview=1";
+  const preview=storefrontPathUrl(ctx.store.slug)+"?preview=1&theme="+encodeURIComponent(theme.id);
   const {data:previewProducts}=await ctx.db.from("products").select("id,name,price_minor,currency").eq("store_id",ctx.store.id).eq("status","active").limit(4);
   const previewSettings={
     accent:settings.accent||"#E50914",background:settings.background||"#050505",text:settings.text||"#F5F5F5",radius:settings.radius||"8px",font:settings.font||"Manrope",
@@ -41,10 +41,7 @@ export default async function ThemeEditor({params}:{params:Promise<{id:string}>}
       </div>
       <div className="flex flex-wrap gap-2">
         <Link href={preview} className="rounded-lg border border-sc-border px-4 py-2 text-sm">Preview draft</Link>
-        <form action={publishMerchantThemeAction}>
-          <input type="hidden" name="themeId" value={theme.id}/>
-          <button className="rounded-lg bg-sc-red px-4 py-2 text-sm font-medium">Publish</button>
-        </form>
+        <button form="theme-editor-form" name="intent" value="publish" className="rounded-lg bg-sc-red px-4 py-2 text-sm font-medium">Save & publish</button>
       </div>
     </div>
 
