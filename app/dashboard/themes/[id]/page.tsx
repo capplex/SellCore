@@ -65,6 +65,14 @@ export default async function ThemeEditor({params}:{params:Promise<{id:string}>}
           </div>
         </section>
 
+        {theme.source_platform&&theme.source_platform!=="sellcore"&&<section className="rounded-xl border border-sc-border bg-sc-card p-5">
+          <h2 className="font-semibold">Import report</h2>
+          <p className="mt-1 text-xs uppercase text-sc-muted">{theme.source_platform}</p>
+          {Array.isArray((theme.import_report as any)?.imported)&&<div className="mt-4"><div className="text-xs font-semibold uppercase text-sc-muted">Imported</div><ul className="mt-2 space-y-1 text-sm text-sc-secondary">{((theme.import_report as any).imported as string[]).map((item,index)=><li key={index}>• {item}</li>)}</ul></div>}
+          {Array.isArray((theme.import_report as any)?.converted)&&<div className="mt-4"><div className="text-xs font-semibold uppercase text-sc-muted">Converted</div><ul className="mt-2 space-y-1 text-sm text-sc-secondary">{((theme.import_report as any).converted as string[]).map((item,index)=><li key={index}>• {item}</li>)}</ul></div>}
+          {Array.isArray((theme.import_report as any)?.warnings)&&<div className="mt-4"><div className="text-xs font-semibold uppercase text-sc-muted">Needs attention</div><ul className="mt-2 space-y-1 text-sm text-amber-200/80">{((theme.import_report as any).warnings as string[]).map((item,index)=><li key={index}>• {item}</li>)}</ul></div>}
+        </section>}
+
         <section className="rounded-xl border border-red-950 bg-[#100708] p-5">
           <h2 className="font-semibold">Delete theme</h2>
           <p className="mt-2 text-sm text-sc-secondary">This permanently deletes this custom theme.</p>
