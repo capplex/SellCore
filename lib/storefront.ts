@@ -124,6 +124,11 @@ export function publicImageUrl(path:string){
   return db.storage.from("product-images").getPublicUrl(path).data.publicUrl;
 }
 
+export function storeAssetPublicUrl(path:string){
+  const db=createSupabaseAdminClient();
+  return db.storage.from("store-assets").getPublicUrl(path).data.publicUrl;
+}
+
 export function themeVars(store:Record<string,unknown>, preview=false){
   const ts=themeSettingsRecord(store);
   const settings=activeThemeSettings(store, preview) ?? (ts.settings as Record<string,string>|undefined) ?? {};
