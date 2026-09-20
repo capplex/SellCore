@@ -21,13 +21,16 @@ export async function loginAction(_state: AuthState, formData: FormData) {
 export async function registerAction(_state: AuthState, formData: FormData) {
   const parsed = authSchema.safeParse({ email: formData.get("email"), password: formData.get("password") });
   if (!parsed.success) return { error: "Enter a valid email and password (8+ characters)." };
+  const requestedNext = String(formData.get("next") || "/onboarding");
+  const next = requestedNext.startsWith("/") ? requestedNext : "/onboarding";
   const supabase = await createSupabaseServerClient();
+  const callbackNext = next.startsWith("/subscribe/") ? `/onboarding?next=${encodeURIComponent(next)}` : next;
   const { data, error } = await supabase.auth.signUp({
     ...parsed.data,
-    options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/onboarding` },
+    options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=${encodeURIComponent(callbackNext)}` },
   });
   if (error) return { error: error.message };
-  if (data.session) redirect("/onboarding");
+  if (data.session) redirect(callbackNext);
   return { success: "Check your email to verify your account." };
 }
 
