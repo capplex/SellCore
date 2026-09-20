@@ -68,10 +68,7 @@ export default async function ThemeEditor({params}:{params:Promise<{id:string}>}
         <section className="rounded-xl border border-red-950 bg-[#100708] p-5">
           <h2 className="font-semibold">Delete theme</h2>
           <p className="mt-2 text-sm text-sc-secondary">This permanently deletes this custom theme.</p>
-          <form action={deleteMerchantThemeAction} className="mt-4">
-            <input type="hidden" name="themeId" value={theme.id}/>
-            <button className="rounded-lg border border-red-900 px-3 py-2 text-sm text-red-300">Delete theme</button>
-          </form>
+          <button formAction={deleteMerchantThemeAction} className="mt-4 rounded-lg border border-red-900 px-3 py-2 text-sm text-red-300">Delete theme</button>
         </section>
       </aside>
     </form>
