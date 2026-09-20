@@ -62,13 +62,23 @@ async function requireStorePreviewAccess(store: Record<string, unknown>) {
   if (!membership) notFound();
 }
 
-export async function getPublicStoreBySlug(slug:string, preview=false){
+export async function getPublicStoreBySlug(slug:string, preview=false, previewThemeId?:string){
   const db=createSupabaseAdminClient();
   let q=db.from("stores").select("*,store_settings(*),theme_settings(*,themes(*),merchant_themes(*))").eq("slug",slug);
   if(!preview)q=q.eq("status","published");
   const {data}=await q.maybeSingle();
   if(!data)notFound();
-  if(preview)await requireStorePreviewAccess(data);
+  if(preview){
+    await requireStorePreviewAccess(data);
+    if(previewThemeId){
+      const {data:theme}=await db.from("merchant_themes").select("*").eq("id",previewThemeId).eq("store_id",data.id).maybeSingle();
+      if(theme){
+        const current=Array.isArray(data.theme_settings)?data.theme_settings[0]:data.theme_settings;
+        const merged={...(current??{}),merchant_themes:theme,custom_theme_id:theme.id};
+        data.theme_settings=Array.isArray(data.theme_settings)?[merged]:merged;
+      }
+    }
+  }
   return data;
 }
 
