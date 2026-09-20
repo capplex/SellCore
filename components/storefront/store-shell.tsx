@@ -4,16 +4,16 @@ import { activeCustomTheme, customThemeCss, themeVars } from "@/lib/storefront";
 
 function storeHref(basePath:string,path=""){return basePath ? basePath+path : (path || "/");}
 
-export function StoreShell({store,basePath,children}:{store:Record<string,unknown>;basePath:string;children:React.ReactNode}){
+export function StoreShell({store,basePath,children,preview=false}:{store:Record<string,unknown>;basePath:string;children:React.ReactNode;preview?:boolean}){
   const settings=(Array.isArray(store.store_settings)?store.store_settings[0]:store.store_settings) as {header_links?:{label:string;href:string}[];footer_links?:{label:string;href:string}[]} | null;
   const sellCoreHome=process.env.NEXT_PUBLIC_APP_URL||"https://sellcore.shop";
   const custom=activeCustomTheme(store);
   const themeSettings=((custom?.settings as Record<string,string>|undefined)??{});
   const headerStyle=themeSettings.headerStyle||"standard";
-  const css=customThemeCss(store);
+  const css=customThemeCss(store,preview);
   const headerInner=headerStyle==="centered"?"mx-auto flex max-w-7xl flex-col items-center gap-4 px-5 py-5 md:flex-row md:justify-between":headerStyle==="compact"?"mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3":"mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5";
 
-  return <div style={themeVars(store)} className="flex min-h-screen flex-col bg-[var(--store-bg)]">
+  return <div style={themeVars(store,preview)} className="flex min-h-screen flex-col bg-[var(--store-bg)]">
     {css&&<style dangerouslySetInnerHTML={{__html:css}}/>}
     <header className="border-b border-white/10">
       <div className={headerInner}>
