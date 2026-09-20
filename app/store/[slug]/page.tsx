@@ -7,11 +7,11 @@ import { storefrontBasePath } from "@/lib/storefront-routing";
 
 export const dynamic="force-dynamic";
 
-export default async function StoreHome({params,searchParams}:{params:Promise<{slug:string}>;searchParams:Promise<{q?:string;preview?:string}>}){
+export default async function StoreHome({params,searchParams}:{params:Promise<{slug:string}>;searchParams:Promise<{q?:string;preview?:string;theme?:string}>}){
   const {slug}=await params;
   const q=await searchParams;
   const preview=q.preview==="1";
-  const store=await getPublicStoreBySlug(slug,preview);
+  const store=await getPublicStoreBySlug(slug,preview,q.theme);
   const [products,reviews]=await Promise.all([getStoreProducts(store.id,q.q),getStoreReviews(store.id)]);
   const basePath=await storefrontBasePath(slug);
   const sections=storefrontSections(store,preview);
