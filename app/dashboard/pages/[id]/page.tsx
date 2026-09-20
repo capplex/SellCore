@@ -52,10 +52,7 @@ export default async function PageEditor({params}:{params:Promise<{id:string}>})
         <section className="rounded-xl border border-red-950 bg-[#100708] p-5">
           <h2 className="font-semibold">Delete page</h2>
           <p className="mt-2 text-sm text-sc-secondary">This permanently removes the page from this store.</p>
-          <form action={deletePageBuilderAction} className="mt-4">
-            <input type="hidden" name="pageId" value={page.id}/>
-            <button className="rounded-lg border border-red-900 px-3 py-2 text-sm text-red-300">Delete page</button>
-          </form>
+          <button formAction={deletePageBuilderAction} className="mt-4 rounded-lg border border-red-900 px-3 py-2 text-sm text-red-300">Delete page</button>
         </section>
       </aside>
     </form>
