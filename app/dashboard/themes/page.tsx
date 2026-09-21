@@ -73,10 +73,10 @@ export default async function Themes(){
         {themes?.map((t)=>{const look=themeLooks[t.slug]??themeLooks.dark;return <form action={selectThemeAction} key={t.id} className={"overflow-hidden rounded-xl border "+(!activeCustomId&&current?.theme_id===t.id?"border-sc-red bg-[#130809]":"border-sc-border bg-sc-card")}>
           <input type="hidden" name="storeId" value={ctx.store.id}/>
           <input type="hidden" name="themeId" value={t.id}/>
-          <div className={`relative h-40 overflow-hidden p-4 ${look.canvas}`}>
+          <div className={`theme-card-preview relative h-40 overflow-hidden p-4 ${look.canvas}`}>
             {t.slug==="technical"&&<div className="absolute inset-0 opacity-20 [background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)] [background-size:18px_18px]"/>}
             <div className="relative flex items-center justify-between text-[8px] font-semibold"><span>YOUR STORE</span><span>SHOP · CART</span></div>
-            <div className={`relative mt-7 ${t.slug==="minimal"?"text-center":t.slug==="editorial"?"text-3xl leading-none tracking-[-.08em]":""}`}><div className="text-xl font-semibold">Make it yours.</div><div className="mt-2 text-[8px] opacity-55">A storefront with actual personality.</div></div>
+            <div className={`theme-card-hero relative mt-7 ${t.slug==="minimal"?"text-center":t.slug==="editorial"?"text-3xl leading-none tracking-[-.08em]":""}`}><div className="theme-card-title text-xl font-semibold">Make it yours.</div><div className="mt-2 text-[8px] opacity-55">A storefront with actual personality.</div></div>
             <div className="relative mt-5 flex gap-2">{[0,1,2].map((item)=><span key={item} className={`h-7 flex-1 border border-current/10 ${t.slug==="modern"?"rounded-xl bg-white/10 backdrop-blur":t.slug==="editorial"?"bg-transparent":"rounded bg-current/5"}`}/>)}</div>
             <span className={`absolute bottom-3 right-3 h-2.5 w-8 rounded-full ${look.accent}`}/>
           </div>
