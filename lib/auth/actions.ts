@@ -38,8 +38,9 @@ export async function forgotPasswordAction(_state: AuthState, formData: FormData
   const email = z.string().email().safeParse(formData.get("email"));
   if (!email.success) return { error: "Enter a valid email." };
   const supabase = await createSupabaseServerClient();
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://sellcore.shop").replace(/\/$/, "");
   const { error } = await supabase.auth.resetPasswordForEmail(email.data, {
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
+    redirectTo: `${appUrl}/auth/callback?next=${encodeURIComponent("/reset-password")}`,
   });
   return error ? { error: error.message } : { success: "Password reset email sent." };
 }
