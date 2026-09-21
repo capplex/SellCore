@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { getDashboardContext } from "@/lib/dashboard-context";
 import { updateStoreAction, addTeamMemberAction } from "@/lib/merchant-actions";
+import { changePasswordAction } from "@/lib/auth/actions";
+import { AuthForm } from "@/components/auth/auth-form";
 import { updateStoreBrandingAction } from "@/lib/store-branding-actions";
 import { storeAssetPublicUrl } from "@/lib/storefront";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -67,7 +69,14 @@ export default async function Settings(){
         </form>
       </div>
 
-      <section className="rounded-xl border border-sc-border bg-sc-card p-5">
+      <div className="space-y-5">
+        <section className="rounded-xl border border-sc-border bg-sc-card p-5">
+          <h2 className="font-semibold">Password</h2>
+          <p className="mt-1 text-sm text-sc-secondary">Signed in with a magic link? Set or change your password here whenever you want.</p>
+          <div className="mt-4"><AuthForm mode="reset" action={changePasswordAction}/></div>
+        </section>
+
+        <section className="rounded-xl border border-sc-border bg-sc-card p-5">
         <h2 className="font-semibold">Team</h2>
         <div className="mt-4 space-y-2">{members?.map(m=><div key={m.user_id} className="rounded-lg border border-sc-border p-3 text-sm"><div>{(Array.isArray(m.users)?m.users[0]?.display_name:(m.users as {display_name?:string}|null)?.display_name)||(Array.isArray(m.users)?m.users[0]?.email:(m.users as {email?:string}|null)?.email)}</div><div className="text-xs text-sc-muted">{m.role}</div></div>)}</div>
         <form action={addTeamMemberAction} className="mt-4 space-y-2">
@@ -75,7 +84,8 @@ export default async function Settings(){
           <select name="role"><option value="staff">Staff</option><option value="admin">Admin</option><option value="viewer">Viewer</option></select>
           <button className="w-full rounded-lg border border-sc-border px-3 py-2 text-sm">Add member</button>
         </form>
-      </section>
+        </section>
+      </div>
     </div>
   </>;
 }
