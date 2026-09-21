@@ -81,3 +81,9 @@ input, textarea, select, button { font:inherit; }
 [data-store-theme="technical"] .store-hero,[data-store-theme="technical"] .store-product-grid{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
 @media(max-width:850px){[data-store-theme="editorial"] .store-hero,[data-store-theme="modern"] .store-hero,[data-store-theme="technical"] .store-hero{grid-template-columns:1fr}[data-store-theme] .store-hero-art{min-height:13rem!important}[data-store-theme="editorial"] .store-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){[data-store-theme="editorial"] .store-product-grid{grid-template-columns:1fr}[data-store-theme="editorial"] .store-product-card:nth-child(even){margin-top:0}}
+
+/* Keep the previews readable at the five-column dashboard width. */
+.theme-card-preview{container-type:inline-size}
+.theme-card-preview .theme-card-title{font-size:clamp(.82rem,12cqw,1.25rem);line-height:1.15;overflow-wrap:anywhere}
+.theme-card-preview .theme-card-hero{margin-top:1.4rem}
+.theme-card-preview .theme-card-hero>div:last-child{line-height:1.25}
